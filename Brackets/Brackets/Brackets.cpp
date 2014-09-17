@@ -6,36 +6,36 @@
 #include <iostream>
 #include <stack>
 
-bool checkBrackets( const std::string& str )
+const std::string StartBracketsPattern("({[<");
+const std::string EndBracketsPattern(")}]>");
+
+bool checkBrackets( const std::string& testLine )
 {
-	if ( str.empty() )
+	if ( testLine.empty() )
 		return true;
 
-	std::stack<std::string::value_type> startBrackets;
+	std::stack<std::string::value_type> startBrackets;	// stack of start brackets
 
-	std::string::const_iterator idx = str.begin();
-	std::string::const_iterator end = str.end();
+	std::string::const_iterator idx = testLine.begin();	// old style iteration
+	std::string::const_iterator end = testLine.end();
 	for (; idx != end; ++idx)
 	{
-		if (*idx == '(' || *idx == '[' || *idx == '{')
+		std::string::value_type symbol = *idx;
+		if ( std::string::npos != StartBracketsPattern.find(symbol) )
 		{
-			startBrackets.push(*idx);
+			startBrackets.push(symbol);
 		}
 		else
 		{
 			if ( startBrackets.empty() )
 				return false;
 
-			std::string::value_type symbol = startBrackets.top();
+			std::string::value_type startBracket = startBrackets.top();
 			startBrackets.pop();
-			if ( *idx == ')' || *idx == ']' || *idx == '}' )
+			std::string::size_type endBracketPos = EndBracketsPattern.find(symbol);
+			if ( std::string::npos != endBracketPos && endBracketPos != StartBracketsPattern.find(startBracket) )
 			{
-				if ( *idx == ')' && symbol != '(')
-					return false;
-				if ( *idx == ']' && symbol != '[')
-					return false;
-				if ( *idx == '}' && symbol != '{')
-					return false;
+				return false;
 			}
 			else
 				; // doesn't matter, there is other symbol we don't care
